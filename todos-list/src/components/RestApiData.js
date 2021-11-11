@@ -1,8 +1,11 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import InsertData from "./InsertData";
+
 const RestApiData = () => {
   const [Data, setData] = useState([]);
+  const [updt, isUpdate] = useState([]);
   const getCovidData = async () => {
     try {
       const res = await fetch("http://127.0.0.1:8000/api_allData/");
@@ -15,34 +18,58 @@ const RestApiData = () => {
   useEffect(() => {
     getCovidData();
   }, []);
+
+  const DelData = async (id) => {
+    await fetch(`http://127.0.0.1:8000/api_delData/${id}`);
+    getCovidData();
+  };
+  const UpdateData = async (id) => {
+    const data = await fetch(`http://127.0.0.1:8000/api_updateItem/${id}`)
+      .then((response) => response.json())
+      .then((data) => console.log(data.subject));
+
+    getCovidData();
+  };
   return (
     <>
       <row>
+        <InsertData addSuccess={getCovidData} />
         <div className="col-md-4 offset-4 mt-5">
-          <h1 className="text-primary text-center border border-primary p-5 rounded">
-            TodoList
-          </h1>
           <table className="table">
             <thead>
               <tr>
-                <th scope="col">#</th>
+                <th scope="col">Id</th>
                 <th scope="col">My List</th>
+                <th scope="col">Update</th>
+                <th scope="col">Delete</th>
               </tr>
             </thead>
             <tbody>
               {Data.map((sub, index) => {
                 return (
                   <tr>
-                    <th scope="row">{}</th>
+                    <th scope="row">{sub.id}</th>
                     <td>{sub.subject}</td>
 
                     <td>
-                      {/* <a
-                    href="{% url 'delItem' pk=item.id %}"
-                    className="btn btn-danger"
-                  >
-                    ❌
-                  </a> */}
+                      <span
+                        onClick={() => {
+                          UpdateData(sub.id);
+                        }}
+                        className="btn btn-warning"
+                      >
+                        🔁
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        onClick={() => {
+                          DelData(sub.id);
+                        }}
+                        className="btn btn-danger"
+                      >
+                        ❌
+                      </span>
                     </td>
                   </tr>
                 );
